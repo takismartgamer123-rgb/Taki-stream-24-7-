@@ -13,9 +13,10 @@ jobs:
         run: |
           echo "Installing dependencies..."
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg curl jq fonts-noto-color-emoji
-          # ✅ الحل: اذا اللوغو ما كاينش، نصنعو واحد وهمي
-          convert -size 100x100 xc:none -fill "#4a00e0" -gravity center -pointsize 60 -annotate 0 "T" logo.png
+          # ✅ زدت imagemagick هنا باش convert يخدم
+          sudo apt-get install -y ffmpeg curl jq fonts-dejavu-core imagemagick
+          # ✅ اذا اللوغو ما كاينش، نصنعو واحد وهمي
+          convert -size 100x100 xc:"#4a00e0" -gravity center -pointsize 60 -fill white -annotate 0 "T" logo.png || touch logo.png
           echo "✅ Setup complete"
 
       - name: 📡 TAKI STREAM 24/7
@@ -24,7 +25,6 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
         run: |
-          # ✅ الحل: نحينا ' و : من النصوص
           NEWS=(
             "عاجل - مواطن لقى 50 دج في سروال قديم راه يخمم يشري بيها قناة يوتيوب"
             "دراسة - 99 بالمئة من الجزائريين يضغطو على تخطي الاعلان قبل ما يبدا"
@@ -35,7 +35,6 @@ jobs:
             "الـ 1K الاولى صعيبة من بعد تولي ساهلة معاكم"
           )
 
-          # ✅ الحل: نتحققو من المفتاح قبل ما نبداو
           if [ -z "$YOUTUBE_STREAM_KEY" ]; then
             echo "❌ YOUTUBE_STREAM_KEY is empty! Check Secrets"
             exit 1
@@ -77,7 +76,6 @@ jobs:
             FAIL_COUNT=0
             PROGRESS_WIDTH=$((800 * PERCENT / 100))
 
-            # ✅ الحل: هربنا النصوص وحطينا خط احتياطي
             SAFE_NEWS=$(echo "$CURRENT_NEWS" | sed "s/'//g" | sed "s/:/ -/g")
             SAFE_MOTIV=$(echo "$CURRENT_MOTIV" | sed "s/'//g" | sed "s/:/ -/g")
 
