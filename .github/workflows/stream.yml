@@ -102,7 +102,8 @@ jobs:
             PROGRESS_WIDTH=$((800 * PERCENT / 100))
 
             # ✅ FIXED: Complete filter_complex with all text overlays and proper closing [out]
-FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='🎬 TAKI STREAM':fontcolor=0x00ff88:fontsize=36:x=250:y=75,drawtext=text='Subs: $SUBS / $GOAL ($PERCENT%)':fontcolor=0x00ffff:fontsize=28:x=80:y=130,drawtext=text='$CURRENT_NEWS':fontcolor=0xffff00:fontsize=20:x=80:y=165:box=1:boxcolor=0x000000@0.5[out]"
+            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='$CURRENT_NEWS':fontcolor=0xffffff:fontsize=32:x=250:y=70:line_spacing=5,drawtext=text='👨‍💻 $CURRENT_MOTIV':fontcolor=0xffff00:fontsize=28:x=250:y=130,drawbox=x=50:y=280:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@0.8:t=fill,drawtext=text='$SUBS / $GOAL':fontcolor=0xffffff:fontsize=36:x=800:y=280[out]"
+            
             ffmpeg -hide_banner -loglevel warning -re \
             -f lavfi -i "color=c=0x0a0a0a:s=1920x1080:r=15" \
             -i logo.png \
