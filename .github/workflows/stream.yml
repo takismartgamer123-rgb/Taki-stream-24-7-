@@ -3,12 +3,12 @@ name: Taki Stream DZ 24/7
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */5 * * *"  # ✅ Changed from 6h to 5h to avoid timeout issues
+    - cron: "0 */5 * * *"
 
 jobs:
   stream:
     runs-on: ubuntu-latest
-    timeout-minutes: 300  # ✅ Changed from 350 to 300 (5 hours) - Safe limit
+    timeout-minutes: 300
     steps:
       - name: 🚀 Setup Environment
         run: |
@@ -16,12 +16,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg curl jq fontconfig fonts-dejavu-core fonts-noto-color-emoji imagemagick
           
-          # Download emoji font
           mkdir -p ~/.fonts
           curl -L "https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf" -o ~/.fonts/NotoColorEmoji.ttf 2>/dev/null || true
           fc-cache -f -v
           
-          # Download logo with fallback
           curl -L "${{ secrets.LOGO_URL }}" -o logo.png 2>/dev/null || touch logo.png
           convert logo.png -resize 100x100 logo.png || true
           
@@ -38,133 +36,21 @@ jobs:
           "عاجل: مواطن لقى 50 دج في سروال قديم، راه يخمم يشري بيها قناة يوتيوب"
           "دراسة: 99% من الجزائريين يضغطو على تخطي الاعلان قبل ما يبدا"
           "خبر مفرح: الباتري تاعك تكمل يوم كامل اذا ما حلتش فيسبوك"
-          "تنبيه: كي يقولك صاحبك نعيطلك بعد 5 دقايق = ما راحش يعيط"
-          "عاجل: واحد عطس في الدار، سمعوه الجيران في الحومة اللي بعدها"
-          "دراسة: المشترك اللي ما يفعلش الجرس هو نفسو اللي يقول ما لحقنيش"
-          "خبر: جماعة الكونيكسيون الضعيفة راهم يحملو البث تاعنا 2019"
-          "عاجل: كوكب الارض يطلب من سونلغاز تخفف عليه شوية"
-          "دراسة: كلمة راني جاي عند الجزائري = مزال ما خرجش من الدار"
-          "خبر: واحد شرى تيليفون جديد باه يصور بيه التيليفون القديم"
-          "تنبيه: اذا شفت جارك يجري الصباح، ماشي رياضة، راه يلحق في الطرام"
-          "عاجل: القهوة تاع الصباح رجعت اغلى من البترول"
-          "دراسة: 80% من وقت الاجتماعات يضيع في جملة وين كنا حابسين"
-          "خبر: واحد دار وضع الطيران في تيليفونو، التيليفون طار صح"
-          "عاجل: الشارجور اللي تسلفو ما يرجعش، يعتبر شهيد"
-          "دراسة: الجزائري يقدر يعيش بلا اوكسيجين بصح ما يقدرش بلا انترنت"
-          "خبر: طفل صغير قال لباباه نشريلك فيراري كي نكبر، باباه راه يستنى 2040"
-          "عاجل: كي تطيحلك الملعقة = عندك ضياف، كي يطيح التيليفون = عندك مصيبة"
-          "دراسة: 70% من ليكور نتاع الجامعة راحو في تصاور السلايدات"
-          "خبر: واحد راح يشري خبز، رجع بعد 3 سوايع علاش؟ تلاقى واحد يعرفو"
-          "عاجل: WiFi الجيران هو الانترنت الوطني الحقيقي"
-          "دراسة: كلمة نرقد ساعة ونوض = 4 سوايع نوم عميق"
-          "خبر: اكثر كلمة تخوف الجزائري: جاك السياربي"
-          "عاجل: الكلافيي تاعك يعرف كلمة السر اكثر منك"
-          "دراسة: المشي للصالون يعتبر رياضة عند بعض الناس"
-          "خبر: واحد دخل لـ Google باه يكتب Google"
-          "عاجل: كي يقولك السيد ان شاء الله = 50% يجي 50% ما يجيش"
-          "دراسة: احسن منبه في العالم هو امك تقولك نوض"
-          "خبر: بطارية التيليفون 1% تعيش اكثر من 50% الى 100%"
-          "عاجل: الميمز هي اللغة الرسمية الثانية في الجزائر"
-          "دراسة: كل جزائري عندو خال في فرنسا حتى و لو ما عندوش"
-          "خبر: واحد بغى يصور القمر، الصورة رجعت نقطة بيضاء"
-          "عاجل: كي تسمع الزغاريت = يا عرس يا نجح واحد في الباك"
-          "دراسة: كلمة نبعثلك في واتساب = الصورة ما توصلش جامي"
-          "خبر: اكثر حاجة تضيع في الدار هي التيليكوموند"
-          "عاجل: كي يقولولك اقعد تتعشى = راهم يطيبو ضرك"
-          "دراسة: الويكاند في الجزائر يبدا الخميس العشية"
-          "خبر: واحد شرى سمارتيفي باه يتفرج يوتيوب في التليفون"
-          "عاجل: كلمة درك نجيك = راني نتفرج في ماتش"
-          "دراسة: 90% من الشعب يعرف يصلح كلش ببريكة و سكوتش"
-          "خبر: انا و الانترنت نتاعي قصة حب من طرف واحد"
-          "عاجل: كي يخلاص الصولد تولي تحسب حتى الدقيقة"
-          "دراسة: السخانة تاع اوت تخليك تحب الشتاء"
-          "خبر: واحد قال لصاحبو راك تسالني قهوة، عندو 3 سنين يستنى فيها"
-          "عاجل: فلاش تاع التيليفون هو الليزر تاع الزوالي"
-          "دراسة: كي تكون جيعان كل الماكلة بنينة"
-          "خبر: التحديثات تاع التيليفون تجي كي تكون في الزيرو كونيكسيون"
-          "عاجل: كي تسمع قلوبالوف = راك في 2009"
-          "دراسة: احسن دكتور هو Google و احسن دواء هو الرقدة"
-          "خبر: واحد نسى التيليفون في الدار، حس روحو عريان في الشارع"
-          "عاجل: الكسكسي يوم الجمعة دستور لا يناقش"
-          "دراسة: كلمة دقيقة برك عند الميكانيسيان = نهار كامل"
-          "خبر: اكثر حاجة تصبرك في الحافلة هي الموسيقى"
-          "عاجل: كي يقولك الطبيب ما تقلقش = المشكل كبير"
-          "دراسة: الليل يولي قصير كي تكون تتفرج فيلم مليح"
-          "خبر: واحد بغى يدير ريجيم، بدا من غدوا عندو 5 سنين"
-          "عاجل: الصيف في الجزائر = 50 درجة في الظل"
-          "دراسة: كي تطيح الانترنت تحس روحك في جزيرة"
-          "خبر: اكثر حاجة تستعملها في التيليفون هي الالة الحاسبة تاع الكريدي"
-          "عاجل: كي يقولك الاستاذ سؤال ساهل = راح فيها"
-          "دراسة: المطر كي يصب في الصيف = المعجزة الثامنة"
-          "خبر: واحد ربح في طومبولا، الجائزة كانت طومبولا اخرى"
-          "عاجل: السكات في القسم = الاستاذ يكتب في الاختبار"
-          "دراسة: كي تشري صباط جديد لازم تشتي عليه"
-          "خبر: الزهر ما عندوش صاحب"
-          "عاجل: كي يخلاص الغاز على 12 تاع الليل = الكارثة"
-          "دراسة: النعاس في الحصة الاخيرة = واجب وطني"
-          "خبر: واحد قال نخرج دقيقة، الشعب مزال يستنى فيه"
-          "عاجل: الابليكاسيون اللي تمسحها ترجع تحتاجها غدوا"
-          "دراسة: كي تكون فرحان الوقت يجري"
-          "خبر: الطاكسي في الشتاء = اغلى من الذهب"
-          "عاجل: كي يجيك كود من 6 ارقام = قلبك يخبط"
-          "دراسة: النهار اللي ما تديش فيه البارابلوي = تصب"
-          "خبر: واحد بغى يبيع التيليفون، الزبون قالو الباتري تاعي خير"
-          "عاجل: الساعة اللي تضبطها باه تنوض = تطفيها و تكمل ترقد"
-          "دراسة: اكثر رياضة نمارسوها هي الجري مور الحافلة"
-          "خبر: الفلاش ديسك عندو رجلين، ديما يهرب"
-          "عاجل: كي يقولك رانا لحقنا = مزال 10 كم"
-          "دراسة: الضحكة تاع صح هي اللي ما عندهاش سبب"
-          "خبر: واحد راح للبحر باه يتصور، البحر ما كانش"
-          "عاجل: كي تكون حافظ و ما يسقسوكش = القهرة"
-          "دراسة: الشاي بلونشين هو المشروب الرسمي للدراسة"
-          "خبر: انا و الرياضة متخاصمين من الابتدائي"
-          "عاجل: كي تسمع بونوي = راهم بداو يطفو الضو"
-          "دراسة: النت يولي سريع كي يرقدو الناس كامل"
-          "خبر: واحد شرى كليماتيزور، جات الشتاء"
-          "عاجل: كي يقولولك دير كيما تحب = دير كيما نقولك"
-          "دراسة: الرقاد بعد الماكلة = حلم كل جزائري"
-          "خبر: التيليفون يطيح ديما على الوجه"
-          "عاجل: كي تسلف دراهم = صاحبك ينساك"
-          "دراسة: الغاشي في الادارة = رياضة يومية"
-          "خبر: واحد قال ندير ستوري و نرقد، فاق الصباح"
-          "عاجل: كي يضربك الضو = تولي تحب الظلام"
-          "دراسة: الفطور تاع رمضان = جائزة نوبل"
-          "خبر: كي تكون صايم الدقيقة تولي ساعة"
-          "عاجل: المكيف في الصيف = الاكسجين"
-          "دراسة: كي تشري حوايج جدد = ما تصبش الشتاء"
-          "خبر: واحد بغى يتصور مع القمر، القمر دار روحو ما شافوش"
-          "عاجل: كي يخلاص الفليكسي = تولي فيلسوف"
-          "دراسة: الضحك بلا سبب = قلة ادب بكري، ضرك نورمال"
-          "خبر: انا و الباك قصة عشق عمرها 3 سنين"
-          "عاجل: واحد شرى باكي شيبس، لقاه 90% هواء و 10% شيبس"
-          "دراسة: الجزائري يقدر يرقد في اي بلاصة الا في سروالو"
           )
 
           # ✅ 2. Motivation Sentences 🔥
           MOTIVATION=(
           "ما تستناش الوقت المناسب، دير لايك ضرك"
           "الـ 1K الاولى صعيبة، من بعد تولي ساهلة معاكم"
-          "كل اشتراك = خطوة لقدام، كل لايك = دفعة للسماء"
-          "قالو النجاح ما يجيش وحدو، يجي مع جماعة كيفكم"
-          "اضرب اشتراك وخلي الباقي علينا حنا والزهر"
-          "اليوم متابع، غدوا انت المول"
-          "من الصفر بدينا، للقمة رايحين بيكم"
-          "اضغط الجرس، باه ما تقولش ما علاباليش"
-          "انت السبة اللي مخلية البث هذا شاعل"
-          "احلم كبير، واشترك اكبر"
           )
 
           # ✅ 3. Initialize Stats with timeout
           echo "📊 Fetching initial channel stats..."
           STATS_JSON=$(curl -s -m 10 "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$YOUTUBE_CHANNEL_ID&key=$YOUTUBE_API_KEY" 2>/dev/null || echo '{}')
           SUBS=$(echo "$STATS_JSON" | jq -r '.items[0].statistics.subscriberCount // "0"' 2>/dev/null || echo "0")
-          VIEWS=$(echo "$STATS_JSON" | jq -r '.items[0].statistics.viewCount // "0"' 2>/dev/null || echo "0")
           GOAL=5000
           
-          # Validate numbers
           [[ "$SUBS" =~ ^[0-9]+$ ]] || SUBS=0
-          [[ "$VIEWS" =~ ^[0-9]+$ ]] || VIEWS=0
-
           LEFT=$((GOAL - SUBS))
           [ $LEFT -lt 0 ] && LEFT=0
           PERCENT=$(( SUBS * 100 / GOAL ))
@@ -182,19 +68,16 @@ jobs:
           while true; do
             LOOP_TIME=$(( SECONDS - START_TIME ))
             
-            # ✅ Exit after 4.5 hours to be safe
             if [ $LOOP_TIME -gt 16200 ]; then
               echo "⏰ Timeout safety exit (4.5 hrs)"
               break
             fi
 
-            # Update news every 3 minutes
             if (( LOOP_TIME % 180 < 10 )); then
               CURRENT_NEWS="${NEWS[$RANDOM % ${#NEWS[@]}]}"
               CURRENT_MOTIV="${MOTIVATION[$RANDOM % ${#MOTIVATION[@]}]}"
             fi
 
-            # Update stats every 30 minutes
             if (( LOOP_TIME % 1800 < 10 )); then
               STATS_JSON=$(curl -s -m 10 "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$YOUTUBE_CHANNEL_ID&key=$YOUTUBE_API_KEY" 2>/dev/null || echo '{}')
               TEMP_SUBS=$(echo "$STATS_JSON" | jq -r '.items[0].statistics.subscriberCount // "0"' 2>/dev/null || echo "0")
@@ -206,7 +89,6 @@ jobs:
               echo "📊 $SUBS subs | $PERCENT%"
             fi
 
-            # ✅ FIXED CONNECTIVITY CHECK
             if ! timeout 10 curl -s "https://www.youtube.com" >/dev/null 2>&1; then
               FAIL_COUNT=$((FAIL_COUNT + 1))
               echo "❌ No internet ($FAIL_COUNT/5)"
@@ -217,28 +99,15 @@ jobs:
             
             FAIL_COUNT=0
 
-            # Calculate progress bar
             PROGRESS_WIDTH=$((800 * PERCENT / 100))
 
-            # ✅ Start FFmpeg with proper variables substitution
+            # ✅ FIXED: Build filter_complex as a shell variable
+            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='Taki Official Stream 24-7':fontcolor=white:fontsize=55:x=300:y=60,drawbox=x=60:y=220:w=900:h=800:color=0x1a1a2e@0.85:t=fill,drawbox=x=60:y=220:w=900:h=80:color=0x00f5ff@1:t=fill,drawtext=text='Subscribers: $SUBS / $GOAL':fontcolor=white:fontsize=40:x=100:y=280,drawbox=x=100:y=350:w=800:h=40:color=0x333333@1:t=fill,drawbox=x=100:y=350:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@1:t=fill,drawtext=text='$PERCENT % - Need $LEFT more':fontcolor=white:fontsize=30:x=150:y=360,drawtext=text='$CURRENT_NEWS':fontcolor=0xffd700:fontsize=24:x=1040:y=300:box=1:boxcolor=0x000000@0.8,drawtext=text='$CURRENT_MOTIV':fontcolor=0x00ff88:fontsize=22:x=1040:y=500:box=1:boxcolor=0x000000@0.8"
+
             ffmpeg -hide_banner -loglevel warning -re \
             -f lavfi -i "color=c=0x0a0a0a:s=1920x1080:r=15" \
             -i logo.png \
-            -filter_complex "
-            [1]scale=100:100[logo];
-            [0][logo]overlay=W-w-50:50,
-            drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,
-            drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,
-            drawtext=text='Taki Official Stream 24-7':fontcolor=white:fontsize=55:x=300:y=60,
-            drawbox=x=60:y=220:w=900:h=800:color=0x1a1a2e@0.85:t=fill,
-            drawbox=x=60:y=220:w=900:h=80:color=0x00f5ff@1:t=fill,
-            drawtext=text='Subscribers: $SUBS / $GOAL':fontcolor=white:fontsize=40:x=100:y=280,
-            drawbox=x=100:y=350:w=800:h=40:color=0x333333@1:t=fill,
-            drawbox=x=100:y=350:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@1:t=fill,
-            drawtext=text='$PERCENT % - Need $LEFT more':fontcolor=white:fontsize=30:x=150:y=360,
-            drawtext=text='$CURRENT_NEWS':fontcolor=0xffd700:fontsize=24:x=1040:y=300:box=1:boxcolor=0x000000@0.8,
-            drawtext=text='$CURRENT_MOTIV':fontcolor=0x00ff88:fontsize=22:x=1040:y=500:box=1:boxcolor=0x000000@0.8
-            " \
+            -filter_complex "$FILTER_COMPLEX" \
             -c:v libx264 -preset ultrafast -pix_fmt yuv420p -r 15 -g 30 -b:v 1500k -maxrate 1500k \
             -c:a aac -b:a 128k -ar 44100 -f lavfi -i "anullsrc=cl=stereo:r=44100" \
             -f flv "rtmp://a.rtmp.youtube.com/live2/$YOUTUBE_STREAM_KEY" 2>&1 | tail -1 || {
