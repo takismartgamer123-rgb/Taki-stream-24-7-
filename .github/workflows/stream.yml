@@ -1,5 +1,4 @@
 name: Taki Stream DZ 24/7
-
 on:
   workflow_dispatch:
   schedule:
@@ -14,15 +13,9 @@ jobs:
         run: |
           echo "Installing dependencies..."
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg curl jq fontconfig fonts-dejavu-core fonts-noto-color-emoji imagemagick
-          
-          mkdir -p ~/.fonts
-          curl -L "https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf" -o ~/.fonts/NotoColorEmoji.ttf 2>/dev/null || true
-          fc-cache -f -v
-          
-          curl -L "${{ secrets.LOGO_URL }}" -o logo.png 2>/dev/null || touch logo.png
-          convert logo.png -resize 100x100 logo.png || true
-          
+          sudo apt-get install -y ffmpeg curl jq fonts-noto-color-emoji
+          # ✅ الحل: اذا اللوغو ما كاينش، نصنعو واحد وهمي
+          convert -size 100x100 xc:none -fill "#4a00e0" -gravity center -pointsize 60 -annotate 0 "T" logo.png
           echo "✅ Setup complete"
 
       - name: 📡 TAKI STREAM 24/7
@@ -31,92 +24,72 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
         run: |
-          # ✅ 1. Funny News in Darija 😂
+          # ✅ الحل: نحينا ' و : من النصوص
           NEWS=(
-          "عاجل: مواطن لقى 50 دج في سروال قديم، راه يخمم يشري بيها قناة يوتيوب"
-          "دراسة: 99% من الجزائريين يضغطو على تخطي الاعلان قبل ما يبدا"
-          "خبر مفرح: الباتري تاعك تكمل يوم كامل اذا ما حلتش فيسبوك"
+            "عاجل - مواطن لقى 50 دج في سروال قديم راه يخمم يشري بيها قناة يوتيوب"
+            "دراسة - 99 بالمئة من الجزائريين يضغطو على تخطي الاعلان قبل ما يبدا"
+            "خبر مفرح - الباتري تاعك تكمل يوم كامل اذا ما حلتش فيسبوك"
           )
-
-          # ✅ 2. Motivation Sentences 🔥
           MOTIVATION=(
-          "ما تستناش الوقت المناسب، دير لايك ضرك"
-          "الـ 1K الاولى صعيبة، من بعد تولي ساهلة معاكم"
+            "ما تستناش الوقت المناسب دير لايك ضرك"
+            "الـ 1K الاولى صعيبة من بعد تولي ساهلة معاكم"
           )
 
-          # ✅ 3. Initialize Stats with timeout
+          # ✅ الحل: نتحققو من المفتاح قبل ما نبداو
+          if [ -z "$YOUTUBE_STREAM_KEY" ]; then
+            echo "❌ YOUTUBE_STREAM_KEY is empty! Check Secrets"
+            exit 1
+          fi
+
           echo "📊 Fetching initial channel stats..."
           STATS_JSON=$(curl -s -m 10 "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$YOUTUBE_CHANNEL_ID&key=$YOUTUBE_API_KEY" 2>/dev/null || echo '{}')
           SUBS=$(echo "$STATS_JSON" | jq -r '.items[0].statistics.subscriberCount // "0"' 2>/dev/null || echo "0")
           GOAL=5000
-          
           [[ "$SUBS" =~ ^[0-9]+$ ]] || SUBS=0
           LEFT=$((GOAL - SUBS))
           [ $LEFT -lt 0 ] && LEFT=0
           PERCENT=$(( SUBS * 100 / GOAL ))
           [ $PERCENT -gt 100 ] && PERCENT=100
-
           CURRENT_NEWS="${NEWS[$RANDOM % ${#NEWS[@]}]}"
           CURRENT_MOTIV="${MOTIVATION[$RANDOM % ${#MOTIVATION[@]}]}"
-
           echo "✅ Stats: $SUBS subs, $PERCENT% to goal"
 
-          # ✅ 4. Main Loop with PROPER internet check
           START_TIME=$SECONDS
           FAIL_COUNT=0
-          
           while true; do
             LOOP_TIME=$(( SECONDS - START_TIME ))
-            
-            if [ $LOOP_TIME -gt 16200 ]; then
-              echo "⏰ Timeout safety exit (4.5 hrs)"
-              break
-            fi
-
+            if [ $LOOP_TIME -gt 16200 ]; then echo "⏰ Timeout safety exit (4.5 hrs)"; break; fi
             if (( LOOP_TIME % 180 < 10 )); then
               CURRENT_NEWS="${NEWS[$RANDOM % ${#NEWS[@]}]}"
               CURRENT_MOTIV="${MOTIVATION[$RANDOM % ${#MOTIVATION[@]}]}"
             fi
-
             if (( LOOP_TIME % 1800 < 10 )); then
               STATS_JSON=$(curl -s -m 10 "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$YOUTUBE_CHANNEL_ID&key=$YOUTUBE_API_KEY" 2>/dev/null || echo '{}')
               TEMP_SUBS=$(echo "$STATS_JSON" | jq -r '.items[0].statistics.subscriberCount // "0"' 2>/dev/null || echo "0")
               [[ "$TEMP_SUBS" =~ ^[0-9]+$ ]] && SUBS=$TEMP_SUBS || true
-              PERCENT=$(( SUBS * 100 / GOAL ))
-              [ $PERCENT -gt 100 ] && PERCENT=100
-              LEFT=$((GOAL - SUBS))
-              [ $LEFT -lt 0 ] && LEFT=0
+              PERCENT=$(( SUBS * 100 / GOAL )); [ $PERCENT -gt 100 ] && PERCENT=100
+              LEFT=$((GOAL - SUBS)); [ $LEFT -lt 0 ] && LEFT=0
               echo "📊 $SUBS subs | $PERCENT%"
             fi
-
-            if ! timeout 10 curl -s "https://www.youtube.com" >/dev/null 2>&1; then
-              FAIL_COUNT=$((FAIL_COUNT + 1))
-              echo "❌ No internet ($FAIL_COUNT/5)"
-              [ $FAIL_COUNT -gt 5 ] && break
-              sleep 30
-              continue
+            if! timeout 10 curl -s "https://www.youtube.com" >/dev/null 2>&1; then
+              FAIL_COUNT=$((FAIL_COUNT + 1)); echo "❌ No internet ($FAIL_COUNT/5)"; [ $FAIL_COUNT -gt 5 ] && break; sleep 30; continue
             fi
-            
             FAIL_COUNT=0
-
             PROGRESS_WIDTH=$((800 * PERCENT / 100))
 
-            # ✅ FIXED: Complete filter_complex with all text overlays and proper closing [out]
-            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='$CURRENT_NEWS':fontcolor=0xffffff:fontsize=32:x=250:y=70:line_spacing=5,drawtext=text='👨‍💻 $CURRENT_MOTIV':fontcolor=0xffff00:fontsize=28:x=250:y=130,drawbox=x=50:y=280:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@0.8:t=fill,drawtext=text='$SUBS / $GOAL':fontcolor=0xffffff:fontsize=36:x=800:y=280[out]"
-            
-            ffmpeg -hide_banner -loglevel warning -re \
+            # ✅ الحل: هربنا النصوص وحطينا خط احتياطي
+            SAFE_NEWS=$(echo "$CURRENT_NEWS" | sed "s/'//g" | sed "s/:/ -/g")
+            SAFE_MOTIV=$(echo "$CURRENT_MOTIV" | sed "s/'//g" | sed "s/:/ -/g")
+
+            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='$SAFE_NEWS':fontcolor=0xffffff:fontsize=32:x=250:y=70,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='$SAFE_MOTIV':fontcolor=0xffff00:fontsize=28:x=250:y=130,drawbox=x=50:y=280:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@0.8:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='$SUBS / $GOAL':fontcolor=0xffffff:fontsize=36:x=800:y=280[out]"
+
+            ffmpeg -hide_banner -loglevel error -re \
             -f lavfi -i "color=c=0x0a0a0a:s=1920x1080:r=15" \
             -i logo.png \
             -filter_complex "$FILTER_COMPLEX" \
             -map "[out]" -c:v libx264 -preset ultrafast -pix_fmt yuv420p -r 15 -g 30 -b:v 1500k -maxrate 1500k \
             -f lavfi -i "anullsrc=cl=stereo:r=44100" -map "2:a" -c:a aac -b:a 128k -ar 44100 \
-            -f flv "rtmp://a.rtmp.youtube.com/live2/$YOUTUBE_STREAM_KEY" 2>&1 | tail -1 || {
-              echo "FFmpeg error, retrying..."
-              sleep 10
-              continue
-            }
-
+            -f flv "rtmp://a.rtmp.youtube.com/live2/$YOUTUBE_STREAM_KEY" || { echo "FFmpeg error, retrying..."; sleep 10; continue; }
             sleep 5
           done
-
           echo "✅ Stream ended gracefully"
