@@ -73,12 +73,12 @@ jobs:
               break
             fi
 
-            if (( LOOP_TIME % 180 < 10 )); do
+            if (( LOOP_TIME % 180 < 10 )); then
               CURRENT_NEWS="${NEWS[$RANDOM % ${#NEWS[@]}]}"
               CURRENT_MOTIV="${MOTIVATION[$RANDOM % ${#MOTIVATION[@]}]}"
             fi
 
-            if (( LOOP_TIME % 1800 < 10 )); do
+            if (( LOOP_TIME % 1800 < 10 )); then
               STATS_JSON=$(curl -s -m 10 "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$YOUTUBE_CHANNEL_ID&key=$YOUTUBE_API_KEY" 2>/dev/null || echo '{}')
               TEMP_SUBS=$(echo "$STATS_JSON" | jq -r '.items[0].statistics.subscriberCount // "0"' 2>/dev/null || echo "0")
               [[ "$TEMP_SUBS" =~ ^[0-9]+$ ]] && SUBS=$TEMP_SUBS || true
@@ -102,7 +102,7 @@ jobs:
             PROGRESS_WIDTH=$((800 * PERCENT / 100))
 
             # ✅ FIXED: Complete filter_complex with all text overlays and proper closing [out]
-            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='$CURRENT_NEWS':fontsize=32:fontcolor=0xffffff:x=100:y=120,drawbox=x=50:y=950:w=$PROGRESS_WIDTH:h=30:color=0x00ff00:t=fill,drawtext=text='$SUBS\/$GOAL Subscribers':fontsize=24:fontcolor=0xffffff:x=800:y=955[out]"
+            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='$CURRENT_NEWS':fontcolor=0xffffff:fontsize=24:x=500:y=80,drawbox=x=80:y=1000:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@0.8:t=fill,drawtext=text='$SUBS/$GOAL ($PERCENT%)':fontcolor=0x00ff88:fontsize=32:x=900:y=1000[out]"
 
             ffmpeg -hide_banner -loglevel warning -re \
             -f lavfi -i "color=c=0x0a0a0a:s=1920x1080:r=15" \
