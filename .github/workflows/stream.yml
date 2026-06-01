@@ -101,15 +101,15 @@ jobs:
 
             PROGRESS_WIDTH=$((800 * PERCENT / 100))
 
-            # ✅ FIXED: Build filter_complex as a shell variable
-            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='Taki Official Stream 24-7':fontcolor=white:fontsize=55:x=300:y=60,drawbox=x=60:y=220:w=900:h=800:color=0x1a1a2e@0.85:t=fill,drawbox=x=60:y=220:w=900:h=80:color=0x00f5ff@1:t=fill,drawtext=text='Subscribers: $SUBS / $GOAL':fontcolor=white:fontsize=40:x=100:y=280,drawbox=x=100:y=350:w=800:h=40:color=0x333333@1:t=fill,drawbox=x=100:y=350:w=$PROGRESS_WIDTH:h=40:color=0x00ff88@1:t=fill,drawtext=text='$PERCENT % - Need $LEFT more':fontcolor=white:fontsize=30:x=150:y=360,drawtext=text='$CURRENT_NEWS':fontcolor=0xffd700:fontsize=24:x=1040:y=300:box=1:boxcolor=0x000000@0.8,drawtext=text='$CURRENT_MOTIV':fontcolor=0x00ff88:fontsize=22:x=1040:y=500:box=1:boxcolor=0x000000@0.8"
+            # ✅ FIXED: Complete filter_complex with all text overlays
+            FILTER_COMPLEX="[1]scale=100:100[logo];[0][logo]overlay=W-w-50:50,drawbox=x=0:y=0:w=1920:h=180:color=0x4a00e0@0.9:t=fill,drawtext=text='LIVE':fontcolor=0x00ff88:fontsize=48:x=80:y=65,drawtext=text='$SUBS/$GOAL Subs ($PERCENT%)':fontcolor=0xffffff:fontsize=32:x=200:y=75,drawtext=text='$CURRENT_NEWS':fontcolor=0xffff00:fontsize=24:x=50:y=130,drawtext=text='$CURRENT_MOTIV':fontcolor=0x00ff88:fontsize=20:x=50:y=160[v];[v]fps=15[out]"
 
             ffmpeg -hide_banner -loglevel warning -re \
             -f lavfi -i "color=c=0x0a0a0a:s=1920x1080:r=15" \
             -i logo.png \
             -filter_complex "$FILTER_COMPLEX" \
-            -c:v libx264 -preset ultrafast -pix_fmt yuv420p -r 15 -g 30 -b:v 1500k -maxrate 1500k \
-            -c:a aac -b:a 128k -ar 44100 -f lavfi -i "anullsrc=cl=stereo:r=44100" \
+            -map "[out]" -c:v libx264 -preset ultrafast -pix_fmt yuv420p -r 15 -g 30 -b:v 1500k -maxrate 1500k \
+            -f lavfi -i "anullsrc=cl=stereo:r=44100" -map "1:a" -c:a aac -b:a 128k -ar 44100 \
             -f flv "rtmp://a.rtmp.youtube.com/live2/$YOUTUBE_STREAM_KEY" 2>&1 | tail -1 || {
               echo "FFmpeg error, retrying..."
               sleep 10
